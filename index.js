@@ -69,12 +69,20 @@ client.connect(err => {
                 res.send(documents);
             })
     })
-    app.get('/ordersByUser', (req, res) => {
+    app.post('/ordersByUser', (req, res) => {
         const email = req.body.email;
         console.log(email);
         orderCollection.find({email: email})
             .toArray((err, documents) => {
                 res.send(documents);
+            })
+    })
+    app.post('/isAdmin', (req, res) => {
+        const email = req.body.email;
+        adminCollection.find({ email: email })
+            .toArray((err, doctors) => {
+                // console.log(doctors);
+                res.send(doctors.length > 0);
             })
     })
 
@@ -154,14 +162,7 @@ client.connect(err => {
             })
     });
 
-    app.post('/isAdmin', (req, res) => {
-        const email = req.body.email;
-        adminCollection.find({ email: email })
-            .toArray((err, doctors) => {
-                // console.log(doctors);
-                res.send(doctors.length > 0);
-            })
-    })
+    
 
 
 
