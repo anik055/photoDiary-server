@@ -6,6 +6,7 @@ const ObjectID  = require('mongodb').ObjectID;
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config()
 
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rzm4j.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 
@@ -30,7 +31,7 @@ client.connect(err => {
     const reviewCollection = client.db("photoDiary").collection("reviews");
     const newOrderCollection = client.db("photoDiary").collection("newOrder");
 
-    // console.log(err);
+
     app.patch('/update/:id', (req, res)=>{
         console.log(req.params.id);
         orderCollection.updateOne({_id: ObjectID(req.params.id)},
@@ -44,21 +45,16 @@ client.connect(err => {
 
     app.post('/addOrder', (req, res) => {
         const order = req.body;
-        // console.log(order);
         orderCollection.insertOne(order)
             .then(result => {
-                // console.log(result);
                 res.send(result.insertedCount > 0)
             })
     });
 
     app.post('/addAdmin', (req, res) => {
         const email = req.body;
-        console.log(req);
-        // console.log(appointment);
         adminCollection.insertOne(email)
             .then(result => {
-                // console.log(result);
                 res.send(result.insertedCount > 0)
             })
     });
@@ -97,29 +93,16 @@ client.connect(err => {
                 }
                 orderCollection.find(filter)
                     .toArray((err, documents) => {
-                        // console.log(email, date.date, doctors, documents)
                         res.send(documents);
                     })
             })
     })
     app.post('/addReview', (req, res) => {
-        // const file = req.files.file;
         const name = req.body.name;
         const description = req.body.description;
         const location = req.body.location;
-        // const newImg = file.data;
-        // console.log(name, prdescription)
-        // const encImg = newImg.toString('base64');
-
-        // var image = {
-        //     contentType: file.mimetype,
-        //     size: file.size,
-        //     img: Buffer.from(encImg, 'base64')
-        // };
-
         reviewCollection.insertOne( {name, location, description})
             .then(result => {
-                // console.log(result);
                 res.send(result.insertedCount > 0);
             })
     })
@@ -130,7 +113,6 @@ client.connect(err => {
         const description = req.body.description;
         const price = req.body.price;
         const newImg = file.data;
-        // console.log(name, price,description)
         const encImg = newImg.toString('base64');
 
         var image = {
@@ -141,7 +123,6 @@ client.connect(err => {
 
         packageCollection.insertOne( {name, price, description, image})
             .then(result => {
-                // console.log(result);
                 res.send(result.insertedCount > 0);
             })
     })
@@ -149,39 +130,31 @@ client.connect(err => {
     app.get('/packages', (req, res) => {
         packageCollection.find({})
             .toArray((err, documents) => {
-                // console.log(documents)
                 res.send(documents);
+                console.log(documents);
             })
     });
 
     app.get('/reviews', (req, res) => {
         reviewCollection.find({})
             .toArray((err, documents) => {
-                // console.log(documents)
                 res.send(documents);
             })
     });
-
-    
-
-
-
 
     app.post('/addToOrder', (req, res) => {
         const order = req.body;
         orderCollection.insertOne(order)
         .then(result => {
-            // console.log(result);
             res.send(result.insertedCount > 0)
         })
     })
 
     app.delete('/deleteOldOrder', (req, res) => {
-      
         const id = ObjectID(req.params.id);
-        // console.log('delete this', id);
         newOrderCollection.deleteMany()
-        .then(documents => {
+            .then(documents => {
+            console.log(document);
             res.send(!!documents.value);
           })
     })
@@ -195,33 +168,23 @@ client.connect(err => {
 
     app.post('/addNewOrder', (req, res) => {
         const order = req.body;
+        console.log(order);
         newOrderCollection.insertOne(order)
-        .then(result => {
-            // console.log(result);
+            .then(result => {
+            console.log(result);
             res.send(result.insertedCount > 0)
-    
+
         })
-    
+
     })
 
-    // app.get('/products', (req, res) => {
-    //     eventCollection.find()
-    //     .toArray((err, items) => {
-    //         res.send(items);
-    //     })
-    // })
-    
       app.delete('/delete/:id', (req, res) => {
-          
+
           const id = ObjectID(req.params.id);
-        //   console.log('delete this', id);
           packageCollection.findOneAndDelete({_id: id})
           .then(documents => {
               res.send(!!documents.value);
             })
       })
-
 });
-
-
 app.listen(process.env.PORT || port)
