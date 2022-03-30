@@ -7,8 +7,9 @@ const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config()
 
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rzm4j.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
+// const uri =
+//   "mongodb+srv://eBachelor:3ApXHf3IoUtd5zGI@cluster0.rzm4j.mongodb.net/bachelorCommerce?retryWrites=true&w=majority";
 
 const app = express()
 
@@ -17,29 +18,37 @@ app.use(cors());
 app.use(express.static('doctors'));
 app.use(fileUpload());
 
-const port = 5000;
+
 
 app.get('/', (req, res) => {
     res.send("hello from db it's working working")
 })
 
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rzm4j.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
+const port = 5000;
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
     const orderCollection = client.db("photoDiary").collection("orders");
     const adminCollection = client.db("photoDiary").collection("admin");
-    const packageCollection = client.db("photoDiary").collection("packages");
     const reviewCollection = client.db("photoDiary").collection("reviews");
     const newOrderCollection = client.db("photoDiary").collection("newOrder");
+    const packageCollection = client.db("photoDiary").collection("packages");
+// const packageCollection = client.db("eBachelor").collection("products");
+// const ordersCollection = client.db("eBachelor").collection("orders");
+// const cartCollection = client.db("eBachelor").collection("cart");
 
 
     app.patch('/update/:id', (req, res)=>{
         console.log(req.params.id);
+        console.log(req.body);
         orderCollection.updateOne({_id: ObjectID(req.params.id)},
         {
             $set: {status:req.body.status}
         })
         .then(result => {
-            console.log(result);
+            // console.log(result);
         })
     })
 
@@ -56,7 +65,7 @@ client.connect(err => {
         adminCollection.insertOne(email)
             .then(result => {
                 res.send(result.insertedCount > 0)
-            })
+            });
     });
 
     app.get('/orders', (req, res) => {
@@ -108,6 +117,7 @@ client.connect(err => {
     })
 
     app.post('/addAPackage', (req, res) => {
+        console.log(req);
         const file = req.files.file;
         const name = req.body.name;
         const description = req.body.description;
